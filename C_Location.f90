@@ -7,7 +7,7 @@ implicit none
  integer:: Ip, Jp
  
  Ip = -1; Jp = -1
- eps = 1e-4
+ eps = 1e-5
  
  outer: do j=1, nj-1
 	do i=1, ni-1

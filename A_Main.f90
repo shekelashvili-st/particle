@@ -137,7 +137,12 @@ do i=1, nt
 		call C_Boundary(x,y,IFaceVector,JFaceVector,NI,NJ, &
 		r_0(1),r_0(2),v_0(1),v_0(2),v_0(3),r(1),r(2),v_p(1),v_p(2),v_p(3),Ip,Jp,St)
 		write(*,*) 'Status=', St
-		exit
+		
+		! St:
+		!      2   
+		!   3     4
+		!      1
+		
 	end if
 	
 	r_0 = r
