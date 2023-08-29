@@ -132,7 +132,7 @@ End Subroutine
  integer:: icr
  real:: r(2),s(2),denom, num_u,num_t
  real:: q(2),p(2)
- eps = 1e-4
+ eps = 1e-10
  
  q(1) = x_m
  q(2) = y_m
@@ -174,13 +174,13 @@ real:: x1, y1, x2, y2, x3, y3, x4, y4
 real:: x2_new, y2_new
 real:: a, b, c, denom
 
-a = y4 - y3
-b = x3 - x4
-c = -(a * x4 + b * y4)
-denom = a*a + b*b
-
-x2_new = ( (b*b-a*a) * x2 - 2*a*b*y2 - 2*c*a)/denom
-y2_new = (-2*a*b*x2 + (a*a-b*b)*y2 - 2*c*b)/denom
+	a = y4 - y3
+	b = x3 - x4
+	c = -(a*x4+b*y4)
+	denom = a*a + b*b
+		
+	x2_new = ((b*b-a*a)*x2 - 2.0*a*b*y2 - 2*c*a)/denom
+	y2_new = (-2.0*a*b*x2 + (a*a-b*b)*y2  - 2*c*b)/denom
 	
 end subroutine
 
