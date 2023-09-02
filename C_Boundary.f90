@@ -1,14 +1,16 @@
 Subroutine C_Boundary(x,y,IFaceVector,JFaceVector,NI,NJ, &
-		x_m,y_m,u_m,v_m,w_m,x_m1,y_m1,u_m1,v_m1,w_m1,Ip1,Jp1,St)
+		x_m,y_m,u_m,v_m,w_m,x_m1,y_m1,u_m1,v_m1,w_m1,D_p,Ip1,Jp1,St)
 implicit none
  integer::NI,NJ,I,J
  real,dimension(NI,NJ):: X,Y
  real:: IFaceVector(NI,NJ-1,2), JFaceVector(NI-1,NJ,2)
  real :: x_m1,y_m1,u_m1,v_m1,w_m1,x_m,y_m,u_m,v_m,w_m
  real:: x_new, y_new
- integer:: Ip1, Jp1, St,icr
+ integer:: Ip1, Jp1, St, icr
  real:: xcros,ycros
  real:: TV(2), NV(2), D, Vn, Vtau
+ !Reflection
+ real:: G(2), G_c(2), G_n, G_ct, e=0.70_8, D_p
  
  St = 0
  
@@ -33,13 +35,21 @@ implicit none
 		NV(2) = -JFaceVector(i, 1, 2) / D
 		TV(1) = -NV(2)
 		TV(2) = NV(1)
-			
-		Vn = u_m * NV(1) + v_m * NV(2)
-		Vtau = u_m * TV(1) + v_m * TV(2)
-			
-		u_m1 = Vtau * TV(1) - Vn * NV(1)
-		v_m1 = Vtau * TV(2) - Vn * NV(2)
-		w_m1 = w_m		
+		
+		!G_0 = [u_m,v_m]
+		G_n = (u_m * NV(1) + v_m * NV(2)) !G_0 * n	* (1+e)
+		
+		!G_c = G_0 + r*omega_p X NV
+		G_c(1) = u_m - D_p/2 * (w_m*NV(2))
+		G_c(2) = v_m + D_p/2 * (w_m*NV(1))
+		G_ct = abs(G_c(1) * TV(1) + G_c(2) * TV(2)) !G_c * tau * 2/7
+		
+		!New velocity
+		u_m1 = u_m - (2*G_ct * TV(1)/7 + G_n * NV(1)*(1+e))
+		v_m1 = v_m - (2*G_ct * TV(2)/7 + G_n * NV(2)*(1+e))
+		
+		!New angular velocity 
+		w_m1 = w_m - 5*2*G_ct/(7*D_p) 	
 		
 		return
 	end if

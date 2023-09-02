@@ -19,7 +19,7 @@ Program Main
   character(*), parameter::  particle_out='traj.dat'
 
 !===  READ INPUT FILE ===
-  namelist /params_particles/ rho_f, rho_p, mu, d_p, J_p, r_0, v_0, dt, nt
+  namelist /params_particles/ rho_f, rho_p, mu, d_p, r_0, v_0, dt, nt
   open(newunit=iu, file=input_particle)
   read(iu, nml=params_particles)
   close(iu)
@@ -112,10 +112,11 @@ print*, 'Sk=', rho_p * d_p**2 /(18*mu) !характерная скорость 
 r = r_0; v_p=v_0
 F = 0
 m_p = pi* d_p**3/6 * rho_p
-print*, 'm_p=', m_p
+J_p = pi/60 * D_p**5 * rho_p
+print*, 'm_p=', m_p, 'J_p=', J_p 
 
 frmt_screen = '(a,i6,1x,5(a,ES15.8,1x),2(a,i6,x))'
-frmt_file = '(i6,x,11(ES23.16,x))'
+frmt_file = '(i6,x,15(ES23.16,x))'
 open(newunit=iu, file=particle_out)
 do i=1, nt
 	call C_Location(r(1), r(2), NI, NJ, X, Y, CellVolume, Ip, Jp)
@@ -129,16 +130,16 @@ do i=1, nt
 
 	v_0 = v_p	
 	F(1:2) = F(1:2)
-	F(3) = F(3)/J_p
+	F(3) = F(3)
 	t = t + dt
 	r = r_0 + dt*v_p
-	v_p = v_0 + dt*0.5
+	v_p = v_0 + dt*F
 	!Определение пересечения с границей
 	call C_Location(r(1), r(2), NI, NJ, X, Y, CellVolume, Ip, Jp)
 	
 	if (Ip==-1 .or. Jp==-1) then
 		call C_Boundary(x,y,IFaceVector,JFaceVector,NI,NJ, &
-		r_0(1),r_0(2),v_0(1),v_0(2),v_0(3),r(1),r(2),v_p(1),v_p(2),v_p(3),Ip,Jp,St)
+		r_0(1),r_0(2),v_0(1),v_0(2),v_0(3),r(1),r(2),v_p(1),v_p(2),v_p(3),D_p,Ip,Jp,St)
 		write(*,*) 'Status=', St
 		
 		! St:
@@ -152,7 +153,9 @@ do i=1, nt
 	
 	write(*,frmt_screen) 'i=', i, 't=', t, 'x=', r(1), 'y=', r(2), &
 					  'F_x=', F(1), 'F_y=', F(2), 'Ip=', Ip, 'Jp=', Jp
-	write(iu,frmt_file) i, t, r(1), r(2), F(1), F(2), fres(1), fres(2), fadd(1), fadd(2), fsaff(1), fsaff(2)		
+	write(iu,frmt_file) i, t, r(1), r(2), v_p(1), v_p(2), v_p(3), F(1), F(2), F(3), &
+						fres(1), fres(2), fadd(1), fadd(2), fsaff(1), fsaff(2)
+	
 end do
 close(iu)
 
