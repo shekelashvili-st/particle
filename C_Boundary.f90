@@ -68,7 +68,8 @@ implicit none
 		
 		return
 	end if
-
+end do
+do j=1,nj-1
 	call Cross_edges(x_m,y_m,x_m1,y_m1,x(1,j),y(1,j),x(1,j+1),y(1,j+1),xcros,ycros,icr)
 	if (icr==1) then
 		st=3
@@ -134,10 +135,10 @@ End Subroutine
  real:: q(2),p(2)
  eps = 1e-10
  
- q(1) = x_m
- q(2) = y_m
- p(1) = x_3
- p(2) = y_3
+ q(1) = x_3
+ q(2) = y_3
+ p(1) = x_m
+ p(2) = y_m
  
  r(1) = x_m1-x_m
  r(2) = y_m1-y_m
@@ -148,10 +149,10 @@ End Subroutine
  icr = 0
  denom = r(1)*s(2)-r(2)*s(1)
  num_t = (q(1)-p(1))*s(2) - (q(2)-p(2))*s(1)
- num_u = -((p(1)-q(1))*r(2) - (p(2)-q(2))*r(1))
+ num_u = (p(1)-q(1))*r(2) - (p(2)-q(2))*r(1)
  
  if (abs(denom)<eps) then
-	if(abs(num_u)>eps) return !parallel lines
+	if(abs(num_u)<eps) return !parallel lines
 	Icr = 1
 	Xcros = x_m1
 	Ycros = y_m1
@@ -179,8 +180,8 @@ real:: a, b, c, denom
 	c = -(a*x4+b*y4)
 	denom = a*a + b*b
 		
-	x2_new = ((b*b-a*a)*x2 - 2.0*a*b*y2 - 2*c*a)/denom
-	y2_new = (-2.0*a*b*x2 + (a*a-b*b)*y2  - 2*c*b)/denom
+	x2_new = ((b*b-a*a)*x2 - 2*a*b*y2 - 2*c*a)/denom
+	y2_new = (-2*a*b*x2 + (a*a-b*b)*y2  - 2*c*b)/denom
 	
 end subroutine
 

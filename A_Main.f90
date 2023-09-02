@@ -11,8 +11,9 @@ Program Main
   real,allocatable,dimension(:,:,:):: CellCenter,IFaceCenter,IFaceVector,JFaceCenter,JFaceVector,&
 &									  GradP,GradP_t,GradP_res,V  ! vector arrays
 !Решение уравнения переноса
-  real:: rho_f, rho_p, mu, d_p, r_0(3), v_0(3), r(3), v_p(3), F(3), U(2)
+  real:: rho_f, rho_p, mu, d_p, r_0(3), v_0(3), r(3), v_p(3), F(3), U(2), w_f
   real:: J_p, m_p, dt, t
+  real:: fres(2),fadd(2),fsaff(2)
   integer:: nt, Ip, Jp, St
   character(:),allocatable:: frmt_screen, frmt_file
   character(*), parameter::  particle_out='traj.dat'
@@ -114,22 +115,24 @@ m_p = pi* d_p**3/6 * rho_p
 print*, 'm_p=', m_p
 
 frmt_screen = '(a,i6,1x,5(a,ES15.8,1x),2(a,i6,x))'
-frmt_file = '(i6,x,5(ES23.16,x))'
+frmt_file = '(i6,x,11(ES23.16,x))'
 open(newunit=iu, file=particle_out)
 do i=1, nt
 	call C_Location(r(1), r(2), NI, NJ, X, Y, CellVolume, Ip, Jp)
 	U(1) = V(IP, JP, 1)
 	U(2) = V(IP, JP, 2)
+	w_f = 1.0/2*(curlV(IP,JP))
 	
 	!Расчёт сил
-	call C_CalcForce(rho_f,rho_p,mu,d_p,v_p,u,F)
+	call C_CalcForce(rho_f,rho_p,mu,d_p,v_p,u,F,v_0,dt,w_f,fres,fadd,fsaff)
 	F = 0
-	
+
+	v_0 = v_p	
 	F(1:2) = F(1:2)
 	F(3) = F(3)/J_p
 	t = t + dt
 	r = r_0 + dt*v_p
-	v_p = v_0 + dt*F
+	v_p = v_0 + dt*0.5
 	!Определение пересечения с границей
 	call C_Location(r(1), r(2), NI, NJ, X, Y, CellVolume, Ip, Jp)
 	
@@ -146,11 +149,10 @@ do i=1, nt
 	end if
 	
 	r_0 = r
-	v_0 = v_p
 	
 	write(*,frmt_screen) 'i=', i, 't=', t, 'x=', r(1), 'y=', r(2), &
 					  'F_x=', F(1), 'F_y=', F(2), 'Ip=', Ip, 'Jp=', Jp
-	write(iu,frmt_file) i, t, r(1), r(2), F(1), F(2)		
+	write(iu,frmt_file) i, t, r(1), r(2), F(1), F(2), fres(1), fres(2), fadd(1), fadd(2), fsaff(1), fsaff(2)		
 end do
 close(iu)
 

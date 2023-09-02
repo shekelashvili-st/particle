@@ -7,7 +7,7 @@ implicit none
  integer:: Ip, Jp
  
  Ip = -1; Jp = -1
- eps = 1e-15
+ eps = 1e-10
  
  outer: do j=1, nj-1
 	do i=1, ni-1
@@ -16,7 +16,7 @@ implicit none
 			tri_S(x(i,j),y(i,j),x(i+1,j),y(i+1,j),x_p,y_p) + &
 			tri_S(x(i,j+1),y(i,j+1),x(i+1,j+1),y(i+1,j+1),x_p,y_p)
 		
-		if (abs(S-CellVolume(i,j))<eps) then
+		if (abs(S-CellVolume(i,j))<=eps) then
 			Ip = I
 			Jp = J
 			exit outer
