@@ -42,7 +42,7 @@ implicit none
 		!G_c = G_0 + r*omega_p X NV
 		G_c(1) = u_m - D_p/2 * (w_m*NV(2))
 		G_c(2) = v_m + D_p/2 * (w_m*NV(1))
-		G_ct = abs(G_c(1) * TV(1) + G_c(2) * TV(2)) !G_c * tau * 2/7
+		G_ct = (G_c(1) * TV(1) + G_c(2) * TV(2)) !G_c * tau * 2/7
 		
 		!New velocity
 		u_m1 = u_m - (2*G_ct * TV(1)/7 + G_n * NV(1)*(1+e))

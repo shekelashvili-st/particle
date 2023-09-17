@@ -126,7 +126,6 @@ do i=1, nt
 	
 	!Расчёт сил
 	call C_CalcForce(rho_f,rho_p,mu,d_p,v_p,u,F,v_0,dt,w_f,fres,fadd,fsaff)
-	F = 0
 
 	v_0 = v_p	
 	F(1:2) = F(1:2)
@@ -153,7 +152,7 @@ do i=1, nt
 	
 	write(*,frmt_screen) 'i=', i, 't=', t, 'x=', r(1), 'y=', r(2), &
 					  'F_x=', F(1), 'F_y=', F(2), 'Ip=', Ip, 'Jp=', Jp
-	write(iu,frmt_file) i, t, r(1), r(2), v_p(1), v_p(2), v_p(3), F(1), F(2), F(3), &
+	write(iu,frmt_file) i, t, r(1), r(2), v_p(1), v_p(2), v_p(3), F(1)*m_p, F(2)*m_p, F(3), &
 						fres(1), fres(2), fadd(1), fadd(2), fsaff(1), fsaff(2)
 	
 end do
